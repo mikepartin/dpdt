@@ -1,0 +1,45 @@
+#!/bin/bash
+# "dpdt" - 03-03-2015 - Modified By: Michael Partin
+# Sources: http://unix.stackexchange.com/questions/108757/piping-to-the-command-substitution-of-a-string-containing-pipes3
+# 			  http://www.thegeekstuff.com/2010/06/bash-if-statement-examples/
+#			  http://stackoverflow.com/questions/18568706/checking-number-of-arguments-bash-script
+# 
+# Decription:
+# This BASH script is used to execute the dpdt.py python script in a manner that allows the user to search for text
+# within the output of the text and display only that information that matches in the report.txt file.
+
+stringToRun="python3 dpdt.py"
+stringAtEnd=""
+if [ -z "$1" ] ;
+	then
+		echo "You must specify folder to search"
+		exit
+fi
+
+if [ "$#" = 1 ] ;
+	then
+		python3 dpdt.py $1 > report.txt
+		exit
+fi
+
+if [ "$#" -gt 1 ] ;
+	then
+		
+		for var in "$@"
+		do
+			if [ "$var" = "-f" ] ;
+				then
+					stringAtEnd="$stringAtEnd | grep"
+				else
+					if [ -z "$stringAtEnd" ] ;
+						then
+							stringToRun="$stringToRun $var"
+						else
+							stringAtEnd="$stringAtEnd $var"
+					fi
+			fi
+		done
+fi
+finalRunString="$stringToRun$stringAtEnd > report.txt"
+eval $finalRunString
+echo "Please Find report.txt for results..."
